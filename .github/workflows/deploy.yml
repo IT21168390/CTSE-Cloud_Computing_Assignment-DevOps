@@ -39,7 +39,7 @@ jobs:
           SERVICES=("authentication-service" "course-management-service" "api-gateway" "config-server" "service-registry")
           for SERVICE in "${SERVICES[@]}"
           do
-            docker build -t $SERVICE ./services/$SERVICE
+            docker build -t $SERVICE ./$SERVICE
             docker tag $SERVICE:latest $ECR_REGISTRY/$SERVICE:latest
             docker push $ECR_REGISTRY/$SERVICE:latest
           done
