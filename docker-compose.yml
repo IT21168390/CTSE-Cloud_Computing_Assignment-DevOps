@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   config-server:
-    image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/config-server:latest
+    image: 626635448599.dkr.ecr.eu-north-1.amazonaws.com/config-server:latest
     ports:
       - "8888:8888"
     networks:
       - backend
 
   service-registry:
-    image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/service-registry:latest
+    image: 626635448599.dkr.ecr.eu-north-1.amazonaws.com/service-registry:latest
     ports:
       - "8761:8761"
     depends_on:
@@ -18,7 +18,7 @@ services:
       - backend
 
   authentication-service:
-    image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/authentication-service:latest
+    image: 626635448599.dkr.ecr.eu-north-1.amazonaws.com/authentication-service:latest
     ports:
       - "8082:8082"
     depends_on:
@@ -28,7 +28,7 @@ services:
       - backend
 
   course-management-service:
-    image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/course-management-service:latest
+    image: 626635448599.dkr.ecr.eu-north-1.amazonaws.com/course-management-service:latest
     ports:
       - "8083:8083"
     depends_on:
@@ -38,7 +38,7 @@ services:
       - backend
 
   api-gateway:
-    image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/api-gateway:latest
+    image: 626635448599.dkr.ecr.eu-north-1.amazonaws.com/api-gateway:latest
     ports:
       - "8081:8081"
     depends_on:
