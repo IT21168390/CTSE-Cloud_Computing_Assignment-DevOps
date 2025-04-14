@@ -7,12 +7,11 @@ on:
       - main
 
 env:
-  AWS_REGION: us-east-1
+  AWS_REGION: eu-north-1
   EC2_HOST: ${{ secrets.EC2_HOST }}
   EC2_USER: ${{ secrets.EC2_USER }}
   EC2_KEY: ${{ secrets.EC2_KEY }}
-  ECR_REPO: <your_ecr_repo>
-  AWS_ACCOUNT_ID: <your_account_id>
+  ECR_REGISTRY: ${{ secrets.ECR_REPOSITORY_URI }}
 
 jobs:
   build-and-deploy:
@@ -41,8 +40,8 @@ jobs:
           for SERVICE in "${SERVICES[@]}"
           do
             docker build -t $SERVICE ./services/$SERVICE
-            docker tag $SERVICE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$SERVICE:latest
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$SERVICE:latest
+            docker tag $SERVICE:latest $ECR_REGISTRY/$SERVICE:latest
+            docker push $ECR_REGISTRY/$SERVICE:latest
           done
 
       - name: Copy Docker Compose file to EC2
