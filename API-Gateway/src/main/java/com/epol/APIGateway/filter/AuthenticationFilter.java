@@ -21,8 +21,6 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         super(Config.class);
     }
 
-    ResponseEntity<TokenValidationResult> responseEntity;
-
     HttpEntity<String> requestEntity = new HttpEntity<>(null, null);
 
     @Override
@@ -55,7 +53,6 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 if (!responseEntity.isValid()) {
                     throw new RuntimeException("Probably an invalid token.");
                 }
-                    //exchange.getRequest().mutate().header("User-Role", responseEntity.getUserRole()).build();
 
                 } catch (Exception e) {
                     throw new RuntimeException("Error during token validation: " + e.getMessage());

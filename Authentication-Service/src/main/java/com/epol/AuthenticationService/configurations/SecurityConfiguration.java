@@ -1,6 +1,5 @@
 package com.epol.AuthenticationService.configurations;
 
-import com.epol.AuthenticationService.models.UserRoles;
 import com.epol.AuthenticationService.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
