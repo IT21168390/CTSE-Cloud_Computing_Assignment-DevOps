@@ -15,7 +15,7 @@ env:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -24,8 +24,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
@@ -36,12 +36,31 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          SERVICES=("authentication-service" "course-management-service" "api-gateway" "config-server" "service-registry")
-          for SERVICE in "${SERVICES[@]}"
+          declare -A SERVICES
+          SERVICES=(
+            ["Authentication-Service"]="authentication-service"
+            ["Course-Management-Service"]="course-management-service"
+            ["API-Gateway"]="api-gateway"
+            ["Config-Server"]="config-server"
+            ["Service-Registry"]="service-registry"
+          )
+
+          for FOLDER in "${!SERVICES[@]}"
           do
-            docker build -t $SERVICE ./services/$SERVICE
-            docker tag $SERVICE:latest $ECR_REGISTRY/$SERVICE:latest
-            docker push $ECR_REGISTRY/$SERVICE:latest
+            IMAGE=${SERVICES[$FOLDER]}
+            echo "🔍 Checking ECR repo for $IMAGE..."
+            aws ecr describe-repositories --repository-names "$IMAGE" > /dev/null 2>&1 || \
+            aws ecr create-repository --repository-name "$IMAGE"
+          done
+          
+          for FOLDER in "${!SERVICES[@]}"
+          do
+            IMAGE=${SERVICES[$FOLDER]}
+            echo "📦 Building $IMAGE from ./$FOLDER"
+          
+            docker build -t $IMAGE ./$FOLDER
+            docker tag $IMAGE:latest $ECR_REGISTRY/$IMAGE:latest
+            docker push $ECR_REGISTRY/$IMAGE:latest
           done
 
       - name: Copy Docker Compose file to EC2
