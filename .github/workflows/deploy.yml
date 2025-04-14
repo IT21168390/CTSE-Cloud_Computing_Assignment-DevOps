@@ -44,6 +44,14 @@ jobs:
             ["Config-Server"]="config-server"
             ["Service-Registry"]="service-registry"
           )
+
+          for FOLDER in "${!SERVICES[@]}"
+          do
+            IMAGE=${SERVICES[$FOLDER]}
+            echo "🔍 Checking ECR repo for $IMAGE..."
+            aws ecr describe-repositories --repository-names "$IMAGE" > /dev/null 2>&1 || \
+            aws ecr create-repository --repository-name "$IMAGE"
+          done
       
           for FOLDER in "${!SERVICES[@]}"
           do
