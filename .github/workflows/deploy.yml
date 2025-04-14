@@ -36,7 +36,7 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          SERVICES=("authentication-service" "course-management-service" "api-gateway" "config-server" "service-registry")
+          SERVICES=("Authentication-Service" "Course-Management-Service" "API-Gateway" "Config-Server" "Service-Registry")
           for SERVICE in "${SERVICES[@]}"
           do
             docker build -t $SERVICE ./$SERVICE
