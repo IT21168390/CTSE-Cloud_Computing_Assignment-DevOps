@@ -36,12 +36,23 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          SERVICES=("authentication-service" "course-management-service" "api-gateway" "config-server" "service-registry")
-          for SERVICE in "${SERVICES[@]}"
+          declare -A SERVICES
+          SERVICES=(
+            ["Authentication-Service"]="authentication-service"
+            ["Course-Management-Service"]="course-management-service"
+            ["API-Gateway"]="api-gateway"
+            ["Config-Server"]="config-server"
+            ["Service-Registry"]="service-registry"
+          )
+      
+          for FOLDER in "${!SERVICES[@]}"
           do
-            docker build -t $SERVICE ./$SERVICE
-            docker tag $SERVICE:latest $ECR_REGISTRY/$SERVICE:latest
-            docker push $ECR_REGISTRY/$SERVICE:latest
+            IMAGE=${SERVICES[$FOLDER]}
+            echo "📦 Building $IMAGE from ./$FOLDER"
+            
+            docker build -t $IMAGE ./$FOLDER
+            docker tag $IMAGE:latest $ECR_REGISTRY/$IMAGE:latest
+            docker push $ECR_REGISTRY/$IMAGE:latest
           done
 
       - name: Copy Docker Compose file to EC2
