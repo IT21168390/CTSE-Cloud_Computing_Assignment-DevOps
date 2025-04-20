@@ -40,16 +40,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run Snyk to check Docker images for vulnerabilities
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          file: Course-Management-Service/Dockerfile
-#          image: ${{ env.ECR_REGISTRY }}/course-management-service:latest
-          args: --severity-threshold=high
-#        continue-on-error: true
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -88,6 +78,18 @@ jobs:
             docker push $ECR_REGISTRY/$IMAGE:latest
           done
 
+
+      - name: Run Snyk to check Docker images for vulnerabilities
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+#          file: Course-Management-Service/Dockerfile
+          image: ${{ env.ECR_REGISTRY }}/course-management-service:latest
+          args: --severity-threshold=high
+        continue-on-error: true
+
+        
       - name: Copy Docker Compose file to EC2
         uses: appleboy/scp-action@master
         with:
