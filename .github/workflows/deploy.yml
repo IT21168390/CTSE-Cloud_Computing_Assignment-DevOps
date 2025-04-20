@@ -99,4 +99,4 @@ jobs:
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
             docker-compose pull
             docker-compose down
-            docker-compose up -d
+            docker-compose up -d --remove-orphans

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   course-management-service:
     image: 626635448599.dkr.ecr.eu-north-1.amazonaws.com/course-management-service:latest
