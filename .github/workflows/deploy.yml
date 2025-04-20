@@ -18,6 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Give execute permission to mvnw
+        run: chmod +x Course-Management-Service/mvnw
+        
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/maven@master
         env:
