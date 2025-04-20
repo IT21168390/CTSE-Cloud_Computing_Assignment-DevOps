@@ -38,11 +38,7 @@ jobs:
         run: |
           declare -A SERVICES
           SERVICES=(
-            ["Authentication-Service"]="authentication-service"
             ["Course-Management-Service"]="course-management-service"
-            ["API-Gateway"]="api-gateway"
-            ["Config-Server"]="config-server"
-            ["Service-Registry"]="service-registry"
           )
 
           for FOLDER in "${!SERVICES[@]}"
