@@ -23,7 +23,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high
+          args: --file=Course-Management-Service/pom.xml --severity-threshold=high
 
   build-and-deploy:
     needs: security
@@ -39,8 +39,10 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          image: ${{ env.ECR_REGISTRY }}/course-management-service:latest
+          file: Course-Management-Service/Dockerfile
+#          image: ${{ env.ECR_REGISTRY }}/course-management-service:latest
           args: --severity-threshold=high
+#        continue-on-error: true
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
