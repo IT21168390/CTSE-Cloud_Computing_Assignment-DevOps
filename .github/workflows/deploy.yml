@@ -27,7 +27,9 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
+          command: test
           args: --file=Course-Management-Service/pom.xml --severity-threshold=high
+          working-directory: Course-Management-Service
 
   build-and-deploy:
     needs: security
