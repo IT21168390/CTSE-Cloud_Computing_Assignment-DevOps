@@ -83,7 +83,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          #          file: Course-Management-Service/Dockerfile
+#          file: Course-Management-Service/Dockerfile
           image: ${{ env.ECR_REGISTRY }}/course-management-service:latest
           args: --severity-threshold=high
         continue-on-error: true
