@@ -14,12 +14,33 @@ env:
   ECR_REGISTRY: ${{ secrets.ECR_REPOSITORY_URI }}
 
 jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/maven@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
   build-and-deploy:
+    needs: security
+
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Run Snyk to check Docker images for vulnerabilities
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ env.ECR_REGISTRY }}/course-management-service:latest
+          args: --severity-threshold=high
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
