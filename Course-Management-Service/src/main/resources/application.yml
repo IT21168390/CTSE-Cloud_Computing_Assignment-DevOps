@@ -1,5 +1,38 @@
+server:
+  port: 8083
+
 spring:
   application:
     name: Course-Management-Service
-  config:
-    import: optional:configserver:http://localhost:8888
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      auto-index-creation: true
+  cloud:
+    config:
+      enabled: false
+#  Add a spring.config.import=configserver: property to your configuration.
+#  If configuration is not required add spring.config.import=optional:configserver: instead.
+#  To disable this check, set spring.cloud.config.enabled=false or
+#  spring.cloud.config.import-check.enabled=false.
+
+    azure:
+      storage:
+        blob:
+          connection-string: BlobEndpoint=${AZURE_BLOB_CONNECTION_STRING}
+          container-name: ${AZURE_CONTAINER_NAME}
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - DELETE
+              - PUT
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 15MB
