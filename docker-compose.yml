@@ -1,6 +1,6 @@
 services:
   course-management-service:
-    image: 626635448599.dkr.ecr.eu-north-1.amazonaws.com/course-management-service:latest
+    image: 683091961190.dkr.ecr.eu-north-1.amazonaws.com/course-management-service:latest
     ports:
       - "8083:8083"
     env_file:
