@@ -118,7 +118,7 @@ jobs:
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: course-management-task.json
+          task-definition: arn:aws:ecs:eu-north-1:683091961190:task-definition/course-management-task:2
           service: course-management-task-service-xm76r2hx
           cluster: course-cluster
           wait-for-service-stability: true
