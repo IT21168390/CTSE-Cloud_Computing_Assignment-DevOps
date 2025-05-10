@@ -1,0 +1,124 @@
+# .github/workflows/deploy.yml
+name: CI/CD to ECS using ECR
+
+on:
+  push:
+    branches:
+      - demo
+
+env:
+  AWS_REGION: eu-north-1
+  EC2_HOST: ${{ secrets.EC2_HOST }}
+  EC2_USER: ${{ secrets.EC2_USER }}
+  EC2_KEY: ${{ secrets.EC2_KEY }}
+  ECR_REGISTRY: ${{ secrets.ECR_REPOSITORY_URI }}
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Give execute permission to mvnw
+        run: chmod +x Course-Management-Service/mvnw
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/maven@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=Course-Management-Service/pom.xml --severity-threshold=high
+        continue-on-error: true
+
+  build-and-deploy:
+    needs: security
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - run: |
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+      - name: Build and push Docker images
+        run: |
+          declare -A SERVICES
+          SERVICES=(
+            ["Course-Management-Service"]="course-management-service"
+          )
+
+          for FOLDER in "${!SERVICES[@]}"
+          do
+            IMAGE=${SERVICES[$FOLDER]}
+            echo "🔍 Checking ECR repo for $IMAGE..."
+            aws ecr describe-repositories --repository-names "$IMAGE" > /dev/null 2>&1 || \
+            aws ecr create-repository --repository-name "$IMAGE"
+          done
+
+          for FOLDER in "${!SERVICES[@]}"
+          do
+            IMAGE=${SERVICES[$FOLDER]}
+            echo "📦 Building $IMAGE from ./$FOLDER"
+
+            docker build -t $IMAGE ./$FOLDER
+            docker tag $IMAGE:latest $ECR_REGISTRY/$IMAGE:latest
+            docker push $ECR_REGISTRY/$IMAGE:latest
+          done
+
+
+      - name: Run Snyk to check Docker images for vulnerabilities
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+#          file: Course-Management-Service/Dockerfile
+          image: ${{ env.ECR_REGISTRY }}/course-management-service:latest
+          args: --severity-threshold=high
+        continue-on-error: true
+
+
+      - name: Copy Docker Compose file to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "docker-compose.yml"
+          target: "~/project"
+
+
+      - name: Create .env file
+        run: |
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" > .env
+          echo "AZURE_BLOB_CONNECTION_STRING=${{ secrets.AZURE_BLOB_CONNECTION_STRING }}" >> .env
+          echo "AZURE_CONTAINER_NAME=${{ secrets.AZURE_CONTAINER_NAME }}" >> .env
+
+      - name: Upload .env to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: ".env"
+          target: "~/project"
+
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: course-management-task.json
+          service: course-management-task-service-xm76r2hx
+          cluster: course-cluster
+          wait-for-service-stability: true
