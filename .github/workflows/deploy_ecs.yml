@@ -115,10 +115,11 @@ jobs:
           target: "~/project"
 
 
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-service@v1
-        with:
-          task-definition: arn:aws:ecs:eu-north-1:683091961190:task-definition/course-management-task:2
-          service: course-management-task-service-xm76r2hx
-          cluster: course-cluster
-          wait-for-service-stability: true
+      - name: Deploy to ECS using AWS CLI
+        run: |
+          aws ecs update-service \
+            --cluster course-cluster \
+            --service course-management-task-service-xm76r2hx \
+            --task-definition arn:aws:ecs:eu-north-1:683091961190:task-definition/course-management-task:2 \
+            --region $AWS_REGION \
+            --force-new-deployment
