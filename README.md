@@ -11,6 +11,7 @@ The system is built as a microservice architecture with the following components
 - AWS ECR for container registry
 - AWS EC2 for deployment
 
+
 ## Technologies Used
 - **Backend Framework:** Spring Boot with Java 17
 - **Database:** MongoDB
