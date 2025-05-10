@@ -32,6 +32,7 @@ The system is built as a microservice architecture with the following components
 - MongoDB
 - Azure Storage Account
 
+
 ## Environment Variables
 The following environment variables are required:
 ```
