@@ -25,13 +25,6 @@ public class CourseController {
     @Autowired
     private CourseService courseService;
 
-
-    @GetMapping("/health")
-    public ResponseEntity<String> health() {
-        return ResponseEntity.ok("OK");
-    }
-
-
     // Get basic Course data to create a new course.
     @PostMapping(value = "/instructor/add-course")
     public ResponseEntity<CourseDAO> addNewCourse(@RequestParam String name, @RequestParam String description, @RequestParam MultipartFile thumbnail, double price) {
