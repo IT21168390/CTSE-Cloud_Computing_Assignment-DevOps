@@ -119,7 +119,7 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster course-cluster \
-            --service course-management-task-service-xm76r2hx \
+            --service course-management-task-service-75k4l4lo \
             --task-definition arn:aws:ecs:eu-north-1:683091961190:task-definition/course-management-task:2 \
             --region $AWS_REGION \
             --force-new-deployment
